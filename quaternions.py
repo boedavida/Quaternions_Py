@@ -1,0 +1,176 @@
+# Creates a quaternion class
+
+# Quaternion construction:
+# 1. q = Quaternion(a=1, b=2, c=3, d=4) # keyword arguments for the components
+# 2. t = 2*np.pi/3
+#    ax = np.array([1., 1., 1.])*(1/np.sqrt(3))
+#    q = Quaternion(a = t, imag=ax) constructs a rotational quaternion with rotation angle t (radians) and rotation axis ax
+#        (which is a numpy array of length 3)
+
+import numpy as np
+
+
+class Quaternion:
+
+    def __init__(self, **kwargs):
+
+        if len(kwargs) == 4:
+            # Construct a quaternion with its components
+            self._a = kwargs['a'] 
+            self._b = kwargs['b'] 
+            self._c = kwargs['c'] 
+            self._d = kwargs['d'] 
+
+        elif len(kwargs) == 2:
+            # Construct a rotational quaternion from the input rotation angle and axis of rotation
+            # a = theta, rotation angle, [radians], theta such that q0 = cos(theta/2)
+            # imag = axis, [1x3 numpy array]
+            # Make sure that imag is a 1x3 unit vector
+            t = kwargs['a'] 
+            ax = kwargs['imag'] / np.linalg.norm(kwargs['imag'])
+            self._a = np.cos(t / 2)
+            self._b = ax[0] * np.sin(t / 2)
+            self._c = ax[1] * np.sin(t / 2)
+            self._d = ax[2] * np.sin(t / 2)
+
+        else:
+            raise TypeError(f'Expected either 2 or 4 keyword arguments but got {len(kwargs)}')
+
+    # Getters. No setters as each quaternion is unique and immutable
+    def a(self):
+        return self._a
+    
+    def b(self):
+        return self._b
+
+    def c(self):
+        return self._c
+    
+    def d(self):
+        return self._d
+
+    # String representation
+    def __str__(self):
+        return f'{self.a()} + {self.b()}i + {self.c()}j + {self.d()}k' 
+
+    # Printable representation
+    def __repr__(self):
+        return f'{self.a()} + {self.b()}i + {self.c()}j + {self.d()}k' 
+
+    def real(self):
+        return self.a()
+
+    def imaginary(self):
+        
+        # returns a tuple, which is immutable
+        return (self.b(), self.c(), self.d()) 
+
+    def conj(self):
+        return Quaternion(a = self.a(), b = -self.b(), c = -self.c(), d = -self.d())
+
+    def norm(self):
+        p = self.conj()*self
+        return np.sqrt(p.a() + p.b() + p.c() + p.d())
+
+    def __neg__(self):
+        return Quaternion(-self.a(), -self.b(), -self.c(), -self.d())
+
+    def __add__(self, other):
+        return Quaternion(a = self.a() + other.a(), b = self.b() + other.b(), c = self.c() + other.c(), d = self.d() + other.d())
+
+    def add(self, other):
+        return Quaternion(a = self.a() + other.a(), b = self.b() + other.b(), c = self.c() + other.c(), d = self.d() + other.d())
+
+    def __sub__(self, other):
+        return Quaternion(a = self.a() - other.a(), b = self.b() - other.b(), c = self.c() - other.c(), d = self.d() - other.d())
+
+    def subtract(self, other):
+        return Quaternion(a = self.a() - other.a(), b = self.b() - other.b(), c = self.c() - other.c(), d = self.d() - other.d())
+
+    def __mul__(self, other):
+        # Quaternion multiplication is not commutative
+        p0 = self.a()
+        q0 = other.a()
+        p = np.array([self.b(), self.c(), self.d()])
+        q = np.array([other.b(), other.c(), other.d()])
+        a0 = p0 * q0 - np.dot(p, q)
+        bcd = p0 * q + q0 * p + np.cross(p, q)
+        return Quaternion(a=a0, b=bcd[0], c=bcd[1], d=bcd[2])
+
+    def multiply(self, other):
+        # Quaternion multiplication is not commutative
+        p0 = self.a()
+        q0 = other.a()
+        p = np.array([self.b(), self.c(), self.d()])
+        q = np.array([other.b(), other.c(), other.d()])
+        a0 = p0 * q0 - np.dot(p, q)
+        bcd = p0 * q + q0 * p + np.cross(p, q)
+        return Quaternion(a=a0, b=bcd[0], c=bcd[1], d=bcd[2])
+
+    def angle(self):
+        return 2.0 * np.arccos(self.a())
+
+    def axis(self):
+        # returns a tuple, which is immutable
+        t = self.angle()
+        q = np.array([self.b(), self.c(), self.d()])
+        r = q / np.sin(t / 2.0)
+        return (r[0], r[1], r[2])
+
+    def inv(self):
+        p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / self.norm() ^ 2
+        return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
+
+    def coef(self):
+        # returns a tuple, which is immutable
+        return (self.a(), self.b(), self.c(), self.d())  
+
+    def isequal(self, other):
+        # Test of equality between two tuples
+        return self.coef() == other.coef() 
+
+    def __eq__(self, other):
+        # Test of equality between two tuples
+        return self.coef() == other.coef() 
+
+    def rotatev(self, v):
+        u = Quaternion(a=0, b=v[0], c=v[1], d=v[2])
+        w = self*u*self.conj()
+        return w.imaginary()
+
+    def rotateframe(self, v):
+        u = Quaternion(a=0, b=v[0], c=v[1], d=v[2])
+        w = self.conj() * u * self
+        return w.imaginary()
+
+
+def main():
+    # Construct two quaternions and multiply one by the other
+    # Quaternion multiplication is not commutative
+    x = Quaternion(a=3, b=1, c=-2, d=1)
+    y = Quaternion(a=2, b=-1, c=2, d=3)
+    z = x * y
+    print("\nQuaternion multiplication:")
+    print(f"x = {x}")
+    print(f"y = {y}")
+    print(f"x * y = {z}")
+
+    # Vector rotation
+    t = 2 * np.pi / 3
+    ax = ( 1/np.sqrt(3), 1 / np.sqrt(3) , 1 / np.sqrt(3) )
+    v = ( 1, 0, 0 ) 
+    q = Quaternion ( a = t, imag = ax )
+    v_rotated = q.rotatev(v)
+    print("\nRotation of a vector in a coordinate frame using a quaternion:")
+    print(f"Vector coordinates before rotation are ({v[0]:.8f}, {v[1]:.8f}, {v[2]:.8f})")
+    print(f"Vector coordinates after rotation of 2*pi/3 about (1, 1, 1) are ({v_rotated[0]:.8f}, {v_rotated[1]:.8f}, {v_rotated[2]:.8f})")
+
+    # Coordinate frame rotation
+    v_frame_rotated = q.rotateframe(v_rotated)
+    print("\nRotation of the coordinate frame using a quaternion:")
+    print(f"Vector coordinates before rotation are ({v_rotated[0]:.8f}, {v_rotated[1]:.8f}, {v_rotated[2]:.8f})")
+    print(f"Vector coordinates after rotation of the frame of 2*pi/3 about (1, 1, 1) are ({v_frame_rotated[0]:.8f}, {v_frame_rotated[1]:.8f}, {v_frame_rotated[2]:.8f})\n\n")
+
+
+if __name__ == '__main__': 
+    main()
