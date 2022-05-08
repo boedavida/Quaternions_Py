@@ -121,10 +121,10 @@ class Quaternion:
         n = self.norm()
         if n**2 != 0.0:
             p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / n**2
-            return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
         else:
-           raise ValueError('Math error: Attempted divide by zero')
-        
+            raise ZeroDivisionError('Attempted division by zero')
+        return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
+
     def coef(self):
         # returns a tuple, which is immutable
         return (self.a(), self.b(), self.c(), self.d())  
