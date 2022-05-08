@@ -118,9 +118,13 @@ class Quaternion:
         return (r[0], r[1], r[2])
 
     def inv(self):
-        p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / self.norm() ^ 2
-        return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
-
+        n = self.norm()
+        if n**2 != 0.0:
+            p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / n**2
+            return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
+        else:
+           raise ValueError('Math error: Attempted divide by zero')
+        
     def coef(self):
         # returns a tuple, which is immutable
         return (self.a(), self.b(), self.c(), self.d())  
@@ -154,6 +158,10 @@ def main():
     print(f"x = {x}")
     print(f"y = {y}")
     print(f"x * y = {z}")
+
+    print("\nQuaternion division is acccomplished by multiplication with the inverse:")
+    d = x * y.inv()
+    print(f"x * y^-1 = {d}")
 
     # Vector rotation
     t = 2 * np.pi / 3
