@@ -122,7 +122,7 @@ class Quaternion:
         if n**2 != 0.0:
             p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / n**2
         else:
-            raise ZeroDivisionError('Attempted division by zero')
+            raise ZeroDivisionError('Division by zero is undefined')
         return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
 
     def coef(self):
@@ -152,7 +152,8 @@ def main():
     # Construct two quaternions and multiply one by the other
     # Quaternion multiplication is not commutative
     x = Quaternion(a=3, b=1, c=-2, d=1)
-    y = Quaternion(a=2, b=-1, c=2, d=3)
+    #y = Quaternion(a=2, b=-1, c=2, d=3)
+    y = Quaternion(a=0, b=0, c=0, d=0)
     z = x * y
     print("\nQuaternion multiplication:")
     print(f"x = {x}")
