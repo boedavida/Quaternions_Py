@@ -61,7 +61,6 @@ class Quaternion:
         return self.a()
 
     def imaginary(self):
-        
         # returns a tuple, which is immutable
         return (self.b(), self.c(), self.d()) 
 
