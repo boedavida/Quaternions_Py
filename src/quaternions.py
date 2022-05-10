@@ -92,15 +92,6 @@ class Quaternion:
             d=self.d() + other.d(),
         )
 
-    def add(self, other):
-        """Quaternion addition"""
-        return Quaternion(
-            a=self.a() + other.a(),
-            b=self.b() + other.b(),
-            c=self.c() + other.c(),
-            d=self.d() + other.d(),
-        )
-
     def __sub__(self, other):
         return Quaternion(
             a=self.a() - other.a(),
@@ -109,27 +100,7 @@ class Quaternion:
             d=self.d() - other.d(),
         )
 
-    def subtract(self, other):
-        """Subtracts two quaternions"""
-        return Quaternion(
-            a=self.a() - other.a(),
-            b=self.b() - other.b(),
-            c=self.c() - other.c(),
-            d=self.d() - other.d(),
-        )
-
     def __mul__(self, other):
-        """Multiplication of two quaternions"""
-        # Quaternion multiplication is not commutative
-        p0 = self.a()
-        q0 = other.a()
-        p = np.array([self.b(), self.c(), self.d()])
-        q = np.array([other.b(), other.c(), other.d()])
-        a0 = p0 * q0 - np.dot(p, q)
-        bcd = p0 * q + q0 * p + np.cross(p, q)
-        return Quaternion(a=a0, b=bcd[0], c=bcd[1], d=bcd[2])
-
-    def multiply(self, other):
         """Multiplication of two quaternions"""
         # Quaternion multiplication is not commutative
         p0 = self.a()
@@ -153,8 +124,12 @@ class Quaternion:
         return (r[0], r[1], r[2])
 
     def inv(self):
-        """Inverse of the quaternion"""
-        p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / self.norm() ^ 2
+        """Multiplicative inverse of the quaternion"""
+        n = self.norm()
+        if n**2 != 0.0:
+            p = np.array([self.a(), -self.b(), -self.c(), -self.d()]) / n**2
+        else:
+            raise ZeroDivisionError("Division by zero is undefined")
         return Quaternion(a=p[0], b=p[1], c=p[2], d=p[3])
 
     def coef(self):
@@ -170,15 +145,14 @@ class Quaternion:
         """Test of equality between two tuples"""
         return self.coef() == other.coef()
 
-    def rotatev(self, v):
-        """Rotates a vector"""
-        # TODO: Needs better description
+    def rotate_vector(self, v):
+        """Rotates a vector about an axis through an angle with respect to a coordinate system"""
         u = Quaternion(a=0, b=v[0], c=v[1], d=v[2])
         w = self * u * self.conj()
         return w.imaginary()
 
-    def rotateframe(self, v):
-        """Rotates a quaternion frame"""
+    def rotate_frame(self, v):
+        """Rotates the coordinate system frame itself"""
         u = Quaternion(a=0, b=v[0], c=v[1], d=v[2])
         w = self.conj() * u * self
         return w.imaginary()
@@ -196,12 +170,16 @@ def main():
     print(f"y = {y}")
     print(f"x * y = {z}")
 
+    print("\nQuaternion division is acccomplished by multiplication with the inverse:")
+    d = x * y.inv()
+    print(f"x * y^-1 = {d}")
+
     # Vector rotation
     t = 2 * np.pi / 3
     ax = (1 / np.sqrt(3), 1 / np.sqrt(3), 1 / np.sqrt(3))
     v = (1, 0, 0)
     q = Quaternion(a=t, imag=ax)
-    v_rotated = q.rotatev(v)
+    v_rotated = q.rotate_vector(v)
     print("\nRotation of a vector in a coordinate frame using a quaternion:")
     print(
         f"Vector coordinates before rotation are ({v[0]:.8f}, {v[1]:.8f}, {v[2]:.8f})"
@@ -216,7 +194,7 @@ def main():
     )
 
     # Coordinate frame rotation
-    v_frame_rotated = q.rotateframe(v_rotated)
+    v_frame_rotated = q.rotate_frame(v_rotated)
     print("\nRotation of the coordinate frame using a quaternion:")
     print(
         " ".join(

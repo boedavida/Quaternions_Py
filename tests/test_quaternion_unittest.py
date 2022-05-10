@@ -41,7 +41,7 @@ class TestQuaternionClass(unittest.TestCase):
         im = np.array([1.0, 1.0, 1.0]) * (1 / np.sqrt(3))
         q = Quaternion(a=t, imag=im)
         v = (1, 0, 0)
-        test_result = q.rotatev(v)
+        test_result = q.rotate_vector(v)
         expected_result = (0, 1, 0)
         self.assertTrue(
             np.allclose(test_result, expected_result, atol=1e-15, equal_nan=False)
@@ -53,7 +53,7 @@ class TestQuaternionClass(unittest.TestCase):
         im = np.array([1.0, 1.0, 1.0]) * (1 / np.sqrt(3))
         q = Quaternion(a=t, imag=im)
         v = (0, 1, 0)
-        test_result = q.rotateframe(v)
+        test_result = q.rotate_frame(v)
         expected_result = (1, 0, 0)
         self.assertTrue(
             np.allclose(test_result, expected_result, atol=1e-15, equal_nan=False)
