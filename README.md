@@ -1,5 +1,5 @@
 # Quaternions_Py
-Python 3 implementation of a class for quaternion arithmetic and use of quaternions for rotations. Numpy is required. The package unittest is required if running the test_quaternion_unittest.py file. 
+Python 3 implementation of a class for quaternion arithmetic and use of quaternions for rotations.  
 
 Quaternions are an extension of the complex numbers. Whereas complex numbers have the form z = a + bi, quaternions have the form q = a + bi + cj +dk, where i, j, k = sqrt(-1), i^2 = j^2 = k^2 = ijk = -1, and of course a, b, c, and d are real numbers.
 
