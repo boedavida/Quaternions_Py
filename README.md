@@ -15,3 +15,5 @@ $ pip install -r requirements_dev.txt
 $ pip install . (or $ pip install -e .)
 
 $ pytest
+
+
