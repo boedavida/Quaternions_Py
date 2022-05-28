@@ -11,5 +11,5 @@ In the class, the quaternion is an object, and the following operations are curr
 
 To run pytest:
 1. $ pip install -r requirements_dev.txt
-2. Either $ pip install . or $ pip install -e .
+2. $ pip install . or $ pip install -e .
 3. $ pytest
