@@ -10,6 +10,8 @@ An important application of quaternions is rotations of vectors or coordinate fr
 In the class, the quaternion is an object, and the following operations are currently implemented for quaternions: addition, subtraction, multiplication, complex conjugation, norm, inverse, the use of quaternions for rotation of a vector with respect to its coordinate frame, and the use of quaternions for rotation of a coordinate frame itself.
 
 To run pytest:
-1. $ pip install -r requirements_dev.txt
-2. Either $ pip install . or $ pip install -e .
-3. $ pytest
+$ pip install -r requirements_dev.txt
+
+$ pip install . (or $ pip install -e .)
+
+$ pytest
