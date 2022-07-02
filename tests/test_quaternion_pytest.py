@@ -1,18 +1,24 @@
 """Tests for the Quaternion class"""
+import pytest
 import numpy as np
 from quaternions import Quaternion
 
 
-def test_mul():
-    """Test the multiplication method"""
-    # Ref: Yan-Bin Jia (2018)
-    # p*q ans: 8 + -9i + -2j + 11k
+@pytest.fixture(name="quaternion_list")
+def fixture_quaternion_list():
     p = Quaternion(a=3.0, b=1.0, c=-2.0, d=1.0)
-    q = Quaternion(a=2.0, b=-1.0, c=2.0, d=3.0)
-    test_result = p * q
-    expected_result = Quaternion(a=8.0, b=-9.0, c=-2.0, d=11.0)
-    assert test_result == expected_result
+    q = Quaternion(a=2.0, b=-1.0, c=2.0, d=3.0)   
+    p_q_product = Quaternion(a=8.0, b=-9.0, c=-2.0, d=11.0)
+    # Ref: Yan-Bin Jia (2018): p*q ans: 8 + -9i + -2j + 11k
+    return [p, q, p_q_product] 
 
+def test_mul(quaternion_list):
+    """Test the multiplication method"""
+    p = quaternion_list[0]
+    q = quaternion_list[1]
+    expected_result = quaternion_list[2]
+    test_result = p * q
+    assert test_result == expected_result
 
 def test_angle():
     """Test the angle based instantiation"""
